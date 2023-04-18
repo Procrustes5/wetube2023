@@ -10,14 +10,14 @@ export const postJoin = async (req, res) => {
   if (password !== password2) {
     return res.status(400).render("join", {
       pageTitle,
-      errorMeassage: "Password Confirmation does not match",
+      errorMessage: "Password Confirmation does not match",
     });
   }
   const exists = await User.exists({ $or: [{ username }, { email }] });
   if (exists) {
     return res.status(400).render("join", {
       pageTitle,
-      errorMeassage: "This username/email is already taken",
+      errorMessage: "This username/email is already taken",
     });
   }
   try {
@@ -32,7 +32,7 @@ export const postJoin = async (req, res) => {
   } catch (error) {
     return res.status(400).render("join", {
       pageTitle,
-      errorMeassage: error._message,
+      errorMessage: error._message,
     });
   }
 };
@@ -47,14 +47,14 @@ export const postLogin = async (req, res) => {
   if (!user) {
     return res.status(400).render("login", {
       pageTitle,
-      errorMeassage: "An account with this username does not exist.",
+      errorMessage: "An account with this username does not exist.",
     });
   }
   const ok = await bcrypt.compare(password, user.password);
   if (!ok) {
     return res.status(400).render("login", {
       pageTitle,
-      errorMeassage: "Wrong password.",
+      errorMessage: "Wrong password.",
     });
   }
   req.session.loggedIn = true;
@@ -138,8 +138,42 @@ export const finishGithubLogin = async (req, res) => {
 export const getEdit = (req, res) => {
   return res.render("edit-profile", { pageTitle: "Edit Profile" });
 };
-export const postEdit = (req, res) => {
-  return res.render("edit-profile");
+export const postEdit = async (req, res) => {
+  const {
+    session: {
+      user: { _id },
+    },
+    body: { name, email, username, location },
+  } = req;
+  const { findUsername, findEmail } = await User.findOne({
+    $or: [{ username }, { email }],
+  });
+  if (findUsername._id !== _id || findEmail._id !== _id) {
+    return res.status(400).render("edit", {
+      pageTitle: "Edit Profile",
+      errorMessage: "This username/email is already taken",
+    });
+  }
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      _id,
+      {
+        name,
+        email,
+        username,
+        location,
+      },
+      { new: true }
+    );
+    res.session.user = updatedUser;
+    return res.redirect("/users/edit");
+  } catch (error) {
+    return res.status(400).render("edit", {
+      pageTitle: "Edit Profile",
+      errorMessage: error._message,
+    });
+  }
 };
 export const logout = (req, res) => {
   req.session.destroy();
