@@ -141,14 +141,19 @@ export const getEdit = (req, res) => {
 export const postEdit = async (req, res) => {
   const {
     session: {
-      user: { _id },
+      user: { _id, avatarUrl },
     },
     body: { name, email, username, location },
+    file,
   } = req;
+  console.log(file);
   const { findUsername, findEmail } = await User.findOne({
     $or: [{ username }, { email }],
   });
-  if (findUsername._id !== _id || findEmail._id !== _id) {
+  if (
+    (findUsername != null && findUsername._id != _id) ||
+    (findEmail != null && findEmail._id != _id)
+  ) {
     return res.status(400).render("edit", {
       pageTitle: "Edit Profile",
       errorMessage: "This username/email is already taken",
@@ -157,6 +162,7 @@ export const postEdit = async (req, res) => {
   const updatedUser = await User.findByIdAndUpdate(
     _id,
     {
+      avatarUrl: file ? file.path : avatarUrl,
       name,
       email,
       username,
@@ -164,7 +170,7 @@ export const postEdit = async (req, res) => {
     },
     { new: true }
   );
-  res.session.user = updatedUser;
+  req.session.user = updatedUser;
   return res.redirect("/users/edit");
 };
 export const logout = (req, res) => {
