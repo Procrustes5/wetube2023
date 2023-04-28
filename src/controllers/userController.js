@@ -126,6 +126,7 @@ export const finishGithubLogin = async (req, res) => {
         socialOnly: true,
         location: userData.location ? userData.location : "Unknown",
       });
+      return res.redirect("/");
     } else {
       req.session.loggedIn = true;
       req.session.user = user;
@@ -214,7 +215,13 @@ export const postChangePassword = async (req, res) => {
 
 export const see = async (req, res) => {
   const { id } = req.params;
-  const user = await User.findById(id).populate("videos");
+  const user = await User.findById(id).populate({
+    path: "videos",
+    populate: {
+      path: "owner",
+      model: "User",
+    },
+  });
   if (!user) {
     return res.status(404).render("404");
   }

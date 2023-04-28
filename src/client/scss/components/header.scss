@@ -13,7 +13,7 @@ header {
     align-items: center;
     li {
       margin-left: 30px;
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 600;
       text-transform: uppercase;
     }
@@ -26,5 +26,10 @@ header {
     color: $bg;
     padding: 7px 10px;
     border-radius: 5px;
+  }
+  .header__avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
   }
 }
