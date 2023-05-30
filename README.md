@@ -7,7 +7,7 @@
   Set Up -> Routers -> Templates -> Mongo DB -> User Authentication -> Webpack -> Styles
   
 3.Execution Screen
-  ![GIFMaker_me](https://github.com/Procrustes5/wetube2023/assets/66271155/870e6fe3-cc67-4b58-b79b-30067c24bcd2)
+ ![Uploading GIFMaker_me.gif…]()
 
 
 4. Memo
